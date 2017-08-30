@@ -47,7 +47,7 @@ var AudioPlayer = function(src, successCallback, errorCallback, statusCallback) 
     this.statusCallback = statusCallback;
     this._duration = -1;
     this._position = -1;
-    exec(null, this.errorCallback, "Media", "create", [this.id, this.src]);
+    exec(null, this.errorCallback, "AudioPlayer", "create", [this.id, this.src]);
 };
 
 // Media messages
@@ -73,7 +73,7 @@ AudioPlayer.get = function(id) {
  * Start or resume playing audio file.
  */
 AudioPlayer.prototype.play = function(options) {
-    exec(null, null, "Media", "startPlayingAudio", [this.id, this.src, options]);
+    exec(null, null, "AudioPlayer", "startPlayingAudio", [this.id, this.src, options]);
 };
 
 /**
@@ -83,7 +83,7 @@ AudioPlayer.prototype.stop = function() {
     var me = this;
     exec(function() {
         me._position = 0;
-    }, this.errorCallback, "Media", "stopPlayingAudio", [this.id]);
+    }, this.errorCallback, "AudioPlayer", "stopPlayingAudio", [this.id]);
 };
 
 /**
@@ -93,14 +93,14 @@ AudioPlayer.prototype.seekTo = function(milliseconds) {
     var me = this;
     exec(function(p) {
         me._position = p;
-    }, this.errorCallback, "Media", "seekToAudio", [this.id, milliseconds]);
+    }, this.errorCallback, "AudioPlayer", "seekToAudio", [this.id, milliseconds]);
 };
 
 /**
  * Pause playing audio file.
  */
 AudioPlayer.prototype.pause = function() {
-    exec(null, this.errorCallback, "Media", "pausePlayingAudio", [this.id]);
+    exec(null, this.errorCallback, "AudioPlayer", "pausePlayingAudio", [this.id]);
 };
 
 /**
@@ -121,21 +121,21 @@ AudioPlayer.prototype.getCurrentPosition = function(success, fail) {
     exec(function(p) {
         me._position = p;
         success(p);
-    }, fail, "Media", "getCurrentPositionAudio", [this.id]);
+    }, fail, "AudioPlayer", "getCurrentPositionAudio", [this.id]);
 };
 
 /**
  * Release the resources.
  */
 AudioPlayer.prototype.release = function() {
-    exec(null, this.errorCallback, "Media", "release", [this.id]);
+    exec(null, this.errorCallback, "AudioPlayer", "release", [this.id]);
 };
 
 /**
  * Adjust the volume.
  */
 AudioPlayer.prototype.setVolume = function(volume) {
-    exec(null, null, "Media", "setVolume", [this.id, volume]);
+    exec(null, null, "AudioPlayer", "setVolume", [this.id, volume]);
 };
 
 /**
@@ -143,7 +143,7 @@ AudioPlayer.prototype.setVolume = function(volume) {
  */
 AudioPlayer.prototype.setRate = function(rate) {
     if (cordova.platformId === 'ios'){
-        exec(null, null, "Media", "setRate", [this.id, rate]);
+        exec(null, null, "AudioPlayer", "setRate", [this.id, rate]);
     } else {
         console.warn('AudioPlayer.setRate method is currently not supported for', cordova.platformId, 'platform.');
     }
@@ -155,7 +155,7 @@ AudioPlayer.prototype.setRate = function(rate) {
 AudioPlayer.prototype.getCurrentAmplitude = function(success, fail) {
     exec(function(p) {
         success(p);
-    }, fail, "Media", "getCurrentAmplitudeAudio", [this.id]);
+    }, fail, "AudioPlayer", "getCurrentAmplitudeAudio", [this.id]);
 };
 
 /**

@@ -15,7 +15,7 @@
  under the License.
  */
 
-#import "CDVSound.h"
+#import "CDVAudioPlayer.h"
 #import "CDVFile.h"
 #import <AVFoundation/AVFoundation.h>
 #include <math.h>
@@ -25,7 +25,7 @@
 #define HTTPS_SCHEME_PREFIX @"https://"
 #define CDVFILE_PREFIX @"cdvfile://"
 
-@implementation CDVSound
+@implementation CDVAudioPlayer
 
 @synthesize soundCache, avSession, currMediaId, statusCallbackId;
 
@@ -444,7 +444,7 @@
     NSURL* resourceURL = audioFile.resourceURL;
 
     if ([resourceURL isFileURL]) {
-        audioFile.player = [[CDVAudioPlayer alloc] initWithContentsOfURL:resourceURL error:&playerError];
+        audioFile.player = [[CDVAudioPlayerWithMediaId alloc] initWithContentsOfURL:resourceURL error:&playerError];
     } else {
         /*
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:resourceURL];
@@ -655,7 +655,7 @@
 
     if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
 
-        __weak CDVSound* weakSelf = self;
+        __weak CDVAudioPlayer* weakSelf = self;
 
         void (^startRecording)(void) = ^{
             NSError* __autoreleasing error = nil;
@@ -791,7 +791,7 @@
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer*)player successfully:(BOOL)flag
 {
     //commented as unused
-    CDVAudioPlayer* aPlayer = (CDVAudioPlayer*)player;
+    CDVAudioPlayerWithMediaId* aPlayer = (CDVAudioPlayerWithMediaId*)player;
     NSString* mediaId = aPlayer.mediaId;
     CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
 
@@ -957,7 +957,7 @@
 @synthesize recorder;
 
 @end
-@implementation CDVAudioPlayer
+@implementation CDVAudioPlayerWithMediaId
 @synthesize mediaId;
 
 @end

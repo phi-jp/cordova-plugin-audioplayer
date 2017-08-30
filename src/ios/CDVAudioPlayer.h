@@ -47,7 +47,7 @@ enum CDVMediaMsg {
 };
 typedef NSUInteger CDVMediaMsg;
 
-@interface CDVAudioPlayer : AVAudioPlayer
+@interface CDVAudioPlayerWithMediaId : AVAudioPlayer
 {
     NSString* mediaId;
 }
@@ -65,7 +65,7 @@ typedef NSUInteger CDVMediaMsg;
 {
     NSString* resourcePath;
     NSURL* resourceURL;
-    CDVAudioPlayer* player;
+    CDVAudioPlayerWithMediaId* player;
     CDVAudioRecorder* recorder;
     NSNumber* volume;
     NSNumber* rate;
@@ -73,7 +73,7 @@ typedef NSUInteger CDVMediaMsg;
 
 @property (nonatomic, strong) NSString* resourcePath;
 @property (nonatomic, strong) NSURL* resourceURL;
-@property (nonatomic, strong) CDVAudioPlayer* player;
+@property (nonatomic, strong) CDVAudioPlayerWithMediaId* player;
 @property (nonatomic, strong) NSNumber* volume;
 @property (nonatomic, strong) NSNumber* rate;
 
@@ -81,7 +81,7 @@ typedef NSUInteger CDVMediaMsg;
 
 @end
 
-@interface CDVSound : CDVPlugin <AVAudioPlayerDelegate, AVAudioRecorderDelegate>
+@interface CDVAudioPlayer : CDVPlugin <AVAudioPlayerDelegate, AVAudioRecorderDelegate>
 {
     NSMutableDictionary* soundCache;
     NSString* currMediaId;

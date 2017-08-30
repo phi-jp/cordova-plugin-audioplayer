@@ -48,7 +48,7 @@ id="cordova-plugin-audioplayer"
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="Media" >
+            <feature name="AudioPlayer" >
                 <param name="android-package" value="org.apache.cordova.media.AudioHandler"/>
             </feature>
         </config-file>
@@ -101,12 +101,12 @@ id="cordova-plugin-audioplayer"
     <!-- ios -->
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
-            <feature name="Media">
-                <param name="ios-package" value="CDVSound" />
+            <feature name="AudioPlayer">
+                <param name="ios-package" value="CDVAudioPlayer" />
             </feature>
         </config-file>
-        <header-file src="src/ios/CDVSound.h" />
-        <source-file src="src/ios/CDVSound.m" />
+        <header-file src="src/ios/CDVAudioPlayer.h" />
+        <source-file src="src/ios/CDVAudioPlayer.m" />
         <preference name="MICROPHONE_USAGE_DESCRIPTION" default=" " />
         <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
             <string>$MICROPHONE_USAGE_DESCRIPTION</string>
