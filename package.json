@@ -1,10 +1,10 @@
 {
-  "name": "cordova-plugin-media",
-  "version": "3.0.2-dev",
-  "description": "Cordova Media Plugin",
+  "name": "cordova-plugin-audioplayer",
+  "version": "0.0.1",
+  "description": "Audio Player Plugin for Cordova",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "cordova-plugin-media",
+    "id": "cordova-plugin-audioplayer",
     "platforms": [
       "android",
       "amazon-fireos",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-media"
+    "url": "https://github.com/phi-jp/cordova-plugin-audioplayer"
   },
   "bugs": {
     "url": "https://issues.apache.org/jira/browse/CB"
@@ -44,8 +44,8 @@
     "test": "npm run jshint",
     "jshint": "jshint www && jshint src && jshint tests"
   },
-  "author": "Apache Software Foundation",
-  "license": "Apache-2.0",
+  "author": "phi",
+  "license": "MIT",
   "engines": {
     "cordovaDependencies": {
       "4.0.0": {
