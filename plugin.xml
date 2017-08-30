@@ -42,7 +42,7 @@ id="cordova-plugin-audioplayer"
     </js-module>
 
     <js-module src="www/AudioPlayer.js" name="Media">
-        <clobbers target="window.Media" />
+        <clobbers target="window.AudioPlayer" />
     </js-module>
 
     <!-- android -->

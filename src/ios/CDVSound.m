@@ -226,8 +226,10 @@
 {
     NSString* mediaId = [command argumentAtIndex:0];
     NSString* resourcePath = [command argumentAtIndex:1];
+    
 
     CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO suppressValidationErrors:YES];
+    [self prepareToPlay:audioFile withId:mediaId];
 
     if (audioFile == nil) {
         NSString* errorMessage = [NSString stringWithFormat:@"Failed to initialize Media file with path %@", resourcePath];
@@ -320,18 +322,19 @@
 
 - (void)startPlayingAudio:(CDVInvokedUrlCommand*)command
 {
+    
     [self.commandDelegate runInBackground:^{
 
     NSString* callbackId = command.callbackId;
 
 #pragma unused(callbackId)
     NSString* mediaId = [command argumentAtIndex:0];
-    NSString* resourcePath = [command argumentAtIndex:1];
     NSDictionary* options = [command argumentAtIndex:2 withDefault:nil];
 
     BOOL bError = NO;
 
-    CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO];
+    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+        
     if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
         if (audioFile.player == nil) {
             bError = [self prepareToPlay:audioFile withId:mediaId];
@@ -573,9 +576,15 @@
                    if (isPlaying) [avPlayer play];
                }];
         } else {
-            NSString* errMsg = @"AVPlayerItem cannot service a seek request with a completion handler until its status is AVPlayerItemStatusReadyToPlay.";
-            [self onStatus:MEDIA_ERROR mediaId:mediaId param:
-              [self createAbortError:errMsg]];
+            // recursive processing
+            [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:NO block:^(NSTimer *timer) {
+                [self seekToAudio:command];
+            }];
+
+
+//            NSString* errMsg = @"AVPlayerItem cannot service a seek request with a completion handler until its status is AVPlayerItemStatusReadyToPlay.";
+//            [self onStatus:MEDIA_ERROR mediaId:mediaId param:
+//              [self createAbortError:errMsg]];
         }
     }
 }
