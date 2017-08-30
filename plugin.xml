@@ -23,7 +23,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 id="cordova-plugin-audioplayer"
     version="0.0.1">
 
-    <name>Media</name>
+    <name>AudioPlayer</name>
     <description>Cordova Media Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,media</keywords>
@@ -41,7 +41,7 @@ id="cordova-plugin-audioplayer"
         <clobbers target="window.MediaError" />
     </js-module>
 
-    <js-module src="www/AudioPlayer.js" name="Media">
+    <js-module src="www/AudioPlayer.js" name="AudioPlayer">
         <clobbers target="window.AudioPlayer" />
     </js-module>
 

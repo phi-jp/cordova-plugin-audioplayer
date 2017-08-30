@@ -173,25 +173,25 @@ AudioPlayer.onStatus = function(id, msgType, value) {
     if (media) {
         switch(msgType) {
             case AudioPlayer.MEDIA_STATE :
-                if (AudioPlayer.statusCallback) {
-                    AudioPlayer.statusCallback(value);
+                if (media.statusCallback) {
+                    media.statusCallback(value);
                 }
                 if (value == AudioPlayer.MEDIA_STOPPED) {
-                    if (AudioPlayer.successCallback) {
-                        AudioPlayer.successCallback();
+                    if (media.successCallback) {
+                        media.successCallback();
                     }
                 }
                 break;
             case AudioPlayer.MEDIA_DURATION :
-                AudioPlayer._duration = value;
+                media._duration = value;
                 break;
             case AudioPlayer.MEDIA_ERROR :
-                if (AudioPlayer.errorCallback) {
-                    AudioPlayer.errorCallback(value);
+                if (media.errorCallback) {
+                    media.errorCallback(value);
                 }
                 break;
             case AudioPlayer.MEDIA_POSITION :
-                AudioPlayer._position = Number(value);
+                media._position = Number(value);
                 break;
             default :
                 if (console.error) {
