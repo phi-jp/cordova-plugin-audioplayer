@@ -21,7 +21,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
 id="cordova-plugin-audioplayer"
-    version="0.1.0">
+    version="0.1.1">
 
     <name>AudioPlayer</name>
     <description>Cordova Media Plugin</description>
@@ -69,11 +69,11 @@ id="cordova-plugin-audioplayer"
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="AudioPlayer">
-                <param name="ios-package" value="CDVAudioPlayer" />
+                <param name="ios-package" value="CordovaAudioPlayer" />
             </feature>
         </config-file>
-        <header-file src="src/ios/CDVAudioPlayer.h" />
-        <source-file src="src/ios/CDVAudioPlayer.m" />
+        <header-file src="src/ios/CordovaAudioPlayer.h" />
+        <source-file src="src/ios/CordovaAudioPlayer.m" />
         <preference name="MICROPHONE_USAGE_DESCRIPTION" default=" " />
         <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
             <string>$MICROPHONE_USAGE_DESCRIPTION</string>

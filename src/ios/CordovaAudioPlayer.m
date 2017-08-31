@@ -15,7 +15,7 @@
  under the License.
  */
 
-#import "CDVAudioPlayer.h"
+#import "CordovaAudioPlayer.h"
 #import "CDVFile.h"
 #import <AVFoundation/AVFoundation.h>
 #include <math.h>
@@ -25,7 +25,7 @@
 #define HTTPS_SCHEME_PREFIX @"https://"
 #define CDVFILE_PREFIX @"cdvfile://"
 
-@implementation CDVAudioPlayer
+@implementation CordovaAudioPlayer
 
 @synthesize soundCache, avSession, currMediaId, statusCallbackId;
 
@@ -133,12 +133,12 @@
 }
 
 // Creates or gets the cached audio file resource object
-- (CDVAudioFile*)audioFileForResource:(NSString*)resourcePath withId:(NSString*)mediaId doValidation:(BOOL)bValidate forRecording:(BOOL)bRecord suppressValidationErrors:(BOOL)bSuppress
+- (CDVAudioPlayerFile*)audioFileForResource:(NSString*)resourcePath withId:(NSString*)mediaId doValidation:(BOOL)bValidate forRecording:(BOOL)bRecord suppressValidationErrors:(BOOL)bSuppress
 {
     BOOL bError = NO;
-    CDVMediaError errcode = MEDIA_ERR_NONE_SUPPORTED;
+    CDVAudioPlayerError errcode = MEDIA_ERR_NONE_SUPPORTED;
     NSString* errMsg = @"";
-    CDVAudioFile* audioFile = nil;
+    CDVAudioPlayerFile* audioFile = nil;
     NSURL* resourceURL = nil;
 
     if ([self soundCache] == nil) {
@@ -153,7 +153,7 @@
             errcode = MEDIA_ERR_ABORTED;
             errMsg = @"invalid media src argument";
         } else {
-            audioFile = [[CDVAudioFile alloc] init];
+            audioFile = [[CDVAudioPlayerFile alloc] init];
             audioFile.resourcePath = resourcePath;
             audioFile.resourceURL = nil;  // validate resourceURL when actually play or record
             [[self soundCache] setObject:audioFile forKey:mediaId];
@@ -183,7 +183,7 @@
 }
 
 // Creates or gets the cached audio file resource object
-- (CDVAudioFile*)audioFileForResource:(NSString*)resourcePath withId:(NSString*)mediaId doValidation:(BOOL)bValidate forRecording:(BOOL)bRecord
+- (CDVAudioPlayerFile*)audioFileForResource:(NSString*)resourcePath withId:(NSString*)mediaId doValidation:(BOOL)bValidate forRecording:(BOOL)bRecord
 {
     return [self audioFileForResource:resourcePath withId:mediaId doValidation:bValidate forRecording:bRecord suppressValidationErrors:NO];
 }
@@ -208,7 +208,7 @@
 }
 
 // helper function to create a error object string
-- (NSDictionary*)createMediaErrorWithCode:(CDVMediaError)code message:(NSString*)message
+- (NSDictionary*)createMediaErrorWithCode:(CDVAudioPlayerError)code message:(NSString*)message
 {
     NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:2];
 
@@ -229,7 +229,7 @@
     NSString* resourcePath = [command argumentAtIndex:1];
     
 
-    CDVAudioFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO suppressValidationErrors:YES];
+    CDVAudioPlayerFile* audioFile = [self audioFileForResource:resourcePath withId:mediaId doValidation:YES forRecording:NO suppressValidationErrors:YES];
     [self prepareToPlay:audioFile withId:mediaId];
 
     if (audioFile == nil) {
@@ -271,7 +271,7 @@
     NSNumber* volume = [command argumentAtIndex:1 withDefault:[NSNumber numberWithFloat:1.0]];
 
     if ([self soundCache] != nil) {
-        CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+        CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
         if (audioFile != nil) {
             audioFile.volume = volume;
             if (audioFile.player) {
@@ -302,7 +302,7 @@
     NSNumber* rate = [command argumentAtIndex:1 withDefault:[NSNumber numberWithFloat:1.0]];
 
     if ([self soundCache] != nil) {
-        CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+        CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
         if (audioFile != nil) {
             audioFile.rate = rate;
             if (audioFile.player) {
@@ -334,7 +334,7 @@
 
     BOOL bError = NO;
 
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+    CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
         
     if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
         if (audioFile.player == nil) {
@@ -435,7 +435,7 @@
     }];
 }
 
-- (BOOL)prepareToPlay:(CDVAudioFile*)audioFile withId:(NSString*)mediaId
+- (BOOL)prepareToPlay:(CDVAudioPlayerFile*)audioFile withId:(NSString*)mediaId
 {
     BOOL bError = NO;
     NSError* __autoreleasing playerError = nil;
@@ -489,7 +489,7 @@
 - (void)stopPlayingAudio:(CDVInvokedUrlCommand*)command
 {
     NSString* mediaId = [command argumentAtIndex:0];
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+    CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
 
     if ((audioFile != nil) && (audioFile.player != nil)) {
         NSLog(@"Stopped playing audio sample '%@'", audioFile.resourcePath);
@@ -510,7 +510,7 @@
             [self onStatus:MEDIA_STATE mediaId:mediaId param:@(MEDIA_STOPPED)];
         } else {
             // cannot seek, wrong state
-            CDVMediaError errcode = MEDIA_ERR_NONE_ACTIVE;
+            CDVAudioPlayerError errcode = MEDIA_ERR_NONE_ACTIVE;
             NSString* errMsg = @"Cannot service stop request until the avPlayer is in 'AVPlayerStatusReadyToPlay' state.";
             [self onStatus:MEDIA_ERROR mediaId:mediaId param:
               [self createMediaErrorWithCode:errcode message:errMsg]];
@@ -521,7 +521,7 @@
 - (void)pausePlayingAudio:(CDVInvokedUrlCommand*)command
 {
     NSString* mediaId = [command argumentAtIndex:0];
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+    CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
 
     if ((audioFile != nil) && ((audioFile.player != nil) || (avPlayer != nil))) {
         NSLog(@"Paused playing audio sample '%@'", audioFile.resourcePath);
@@ -543,7 +543,7 @@
 
     NSString* mediaId = [command argumentAtIndex:0];
 
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+    CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
     double position = [[command argumentAtIndex:1] doubleValue];
     double posInSeconds = position / 1000;
 
@@ -597,14 +597,11 @@
     //NSString* mediaId = self.currMediaId;
 
     if (mediaId != nil) {
-        CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+        CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
 
         if (audioFile != nil) {
             if (audioFile.player && [audioFile.player isPlaying]) {
                 [audioFile.player stop];
-            }
-            if (audioFile.recorder && [audioFile.recorder isRecording]) {
-                [audioFile.recorder stop];
             }
             if (avPlayer != nil) {
                 [avPlayer pause];
@@ -626,7 +623,7 @@
     NSString* mediaId = [command argumentAtIndex:0];
 
 #pragma unused(mediaId)
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+    CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
     double position = -1;
 
     if ((audioFile != nil) && (audioFile.player != nil) && [audioFile.player isPlaying]) {
@@ -643,157 +640,12 @@
     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
 }
 
-- (void)startRecordingAudio:(CDVInvokedUrlCommand*)command
-{
-    NSString* callbackId = command.callbackId;
-
-#pragma unused(callbackId)
-
-    NSString* mediaId = [command argumentAtIndex:0];
-    CDVAudioFile* audioFile = [self audioFileForResource:[command argumentAtIndex:1] withId:mediaId doValidation:YES forRecording:YES];
-    __block NSString* errorMsg = @"";
-
-    if ((audioFile != nil) && (audioFile.resourceURL != nil)) {
-
-        __weak CDVAudioPlayer* weakSelf = self;
-
-        void (^startRecording)(void) = ^{
-            NSError* __autoreleasing error = nil;
-
-            if (audioFile.recorder != nil) {
-                [audioFile.recorder stop];
-                audioFile.recorder = nil;
-            }
-            // get the audioSession and set the category to allow recording when device is locked or ring/silent switch engaged
-            if ([weakSelf hasAudioSession]) {
-                if (![weakSelf.avSession.category isEqualToString:AVAudioSessionCategoryPlayAndRecord]) {
-                    [weakSelf.avSession setCategory:AVAudioSessionCategoryRecord error:nil];
-                }
-
-                if (![weakSelf.avSession setActive:YES error:&error]) {
-                    // other audio with higher priority that does not allow mixing could cause this to fail
-                    errorMsg = [NSString stringWithFormat:@"Unable to record audio: %@", [error localizedFailureReason]];
-                    [weakSelf onStatus:MEDIA_ERROR mediaId:mediaId param:
-                           [self createAbortError:errorMsg]];
-                    return;
-                }
-            }
-
-            // create a new recorder for each start record
-            bool isWav=[[audioFile.resourcePath pathExtension] isEqualToString:@"wav"];
-            NSMutableDictionary *audioSettings = [NSMutableDictionary dictionaryWithDictionary:
-                                            @{AVSampleRateKey: @(44100),
-                                             AVNumberOfChannelsKey: @(1),
-                                             }];
-            if (isWav)  {
-                audioSettings[AVFormatIDKey]=@(kAudioFormatLinearPCM);
-                audioSettings[AVLinearPCMBitDepthKey]=@(16);
-                audioSettings[AVLinearPCMIsBigEndianKey]=@(false);
-                audioSettings[AVLinearPCMIsFloatKey]=@(false);
-            } else {
-                audioSettings[AVFormatIDKey]=@(kAudioFormatMPEG4AAC);
-                audioSettings[AVEncoderAudioQualityKey]=@(AVAudioQualityMedium);
-            }
-            audioFile.recorder = [[CDVAudioRecorder alloc] initWithURL:audioFile.resourceURL settings:audioSettings error:&error];
-
-            bool recordingSuccess = NO;
-            if (error == nil) {
-                audioFile.recorder.delegate = weakSelf;
-                audioFile.recorder.mediaId = mediaId;
-                audioFile.recorder.meteringEnabled = YES;
-                recordingSuccess = [audioFile.recorder record];
-                if (recordingSuccess) {
-                    NSLog(@"Started recording audio sample '%@'", audioFile.resourcePath);
-                    [weakSelf onStatus:MEDIA_STATE mediaId:mediaId param:@(MEDIA_RUNNING)];
-                }
-            }
-
-            if ((error != nil) || (recordingSuccess == NO)) {
-                if (error != nil) {
-                    errorMsg = [NSString stringWithFormat:@"Failed to initialize AVAudioRecorder: %@\n", [error localizedFailureReason]];
-                } else {
-                    errorMsg = @"Failed to start recording using AVAudioRecorder";
-                }
-                audioFile.recorder = nil;
-                if (weakSelf.avSession) {
-                    [weakSelf.avSession setActive:NO error:nil];
-                }
-                [weakSelf onStatus:MEDIA_ERROR mediaId:mediaId param:
-                           [self createAbortError:errorMsg]];
-            }
-        };
-
-        SEL rrpSel = NSSelectorFromString(@"requestRecordPermission:");
-        if ([self hasAudioSession] && [self.avSession respondsToSelector:rrpSel])
-        {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-            [self.avSession performSelector:rrpSel withObject:^(BOOL granted){
-                if (granted) {
-                    startRecording();
-                } else {
-                    NSString* msg = @"Error creating audio session, microphone permission denied.";
-                    NSLog(@"%@", msg);
-                    audioFile.recorder = nil;
-                    if (weakSelf.avSession) {
-                        [weakSelf.avSession setActive:NO error:nil];
-                    }
-                    [weakSelf onStatus:MEDIA_ERROR mediaId:mediaId param:
-                           [self createAbortError:msg]];
-                }
-            }];
-#pragma clang diagnostic pop
-        } else {
-            startRecording();
-        }
-
-    } else {
-        // file did not validate
-        NSString* errorMsg = [NSString stringWithFormat:@"Could not record audio at '%@'", audioFile.resourcePath];
-        [self onStatus:MEDIA_ERROR mediaId:mediaId param:
-          [self createAbortError:errorMsg]];
-    }
-}
-
-- (void)stopRecordingAudio:(CDVInvokedUrlCommand*)command
-{
-    NSString* mediaId = [command argumentAtIndex:0];
-
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
-
-    if ((audioFile != nil) && (audioFile.recorder != nil)) {
-        NSLog(@"Stopped recording audio sample '%@'", audioFile.resourcePath);
-        [audioFile.recorder stop];
-        // no callback - that will happen in audioRecorderDidFinishRecording
-    }
-}
-
-- (void)audioRecorderDidFinishRecording:(AVAudioRecorder*)recorder successfully:(BOOL)flag
-{
-    CDVAudioRecorder* aRecorder = (CDVAudioRecorder*)recorder;
-    NSString* mediaId = aRecorder.mediaId;
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
-
-    if (audioFile != nil) {
-        NSLog(@"Finished recording audio sample '%@'", audioFile.resourcePath);
-    }
-    if (flag) {
-        [self onStatus:MEDIA_STATE mediaId:mediaId param:@(MEDIA_STOPPED)];
-    } else {
-        [self onStatus:MEDIA_ERROR mediaId:mediaId param:
-          [self createMediaErrorWithCode:MEDIA_ERR_DECODE message:nil]];
-    }
-    if (self.avSession) {
-        [self.avSession setActive:NO error:nil];
-    }
-}
-
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer*)player successfully:(BOOL)flag
 {
     //commented as unused
     CDVAudioPlayerWithMediaId* aPlayer = (CDVAudioPlayerWithMediaId*)player;
     NSString* mediaId = aPlayer.mediaId;
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
+    CDVAudioPlayerFile* audioFile = [[self soundCache] objectForKey:mediaId];
 
     if (audioFile != nil) {
         NSLog(@"Finished playing audio sample '%@'", audioFile.resourcePath);
@@ -841,14 +693,11 @@
 
 - (void)onReset
 {
-    for (CDVAudioFile* audioFile in [[self soundCache] allValues]) {
+    for (CDVAudioPlayerFile* audioFile in [[self soundCache] allValues]) {
         if (audioFile != nil) {
             if (audioFile.player != nil) {
                 [audioFile.player stop];
                 audioFile.player.currentTime = 0;
-            }
-            if (audioFile.recorder != nil) {
-                [audioFile.recorder stop];
             }
         }
     }
@@ -856,71 +705,12 @@
     [[self soundCache] removeAllObjects];
 }
 
-- (void)getCurrentAmplitudeAudio:(CDVInvokedUrlCommand*)command
-{
-    NSString* callbackId = command.callbackId;
-    NSString* mediaId = [command argumentAtIndex:0];
-
-#pragma unused(mediaId)
-    CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
-    float amplitude = 0; // The linear 0.0 .. 1.0 value
-
-    if ((audioFile != nil) && (audioFile.recorder != nil) && [audioFile.recorder isRecording]) {
-        [audioFile.recorder updateMeters];
-        float minDecibels = -60.0f; // Or use -60dB, which I measured in a silent room.
-        float decibels    = [audioFile.recorder averagePowerForChannel:0];
-        if (decibels < minDecibels) {
-            amplitude = 0.0f;
-        } else if (decibels >= 0.0f) {
-            amplitude = 1.0f;
-        } else {
-            float root            = 2.0f;
-            float minAmp          = powf(10.0f, 0.05f * minDecibels);
-            float inverseAmpRange = 1.0f / (1.0f - minAmp);
-            float amp             = powf(10.0f, 0.05f * decibels);
-            float adjAmp          = (amp - minAmp) * inverseAmpRange;
-            amplitude = powf(adjAmp, 1.0f / root);
-        }
-    }
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:amplitude];
-    [self.commandDelegate sendPluginResult:result callbackId:callbackId];
- }
-
- - (void)resumeRecordingAudio:(CDVInvokedUrlCommand*)command
-  {
-     NSString* mediaId = [command argumentAtIndex:0];
-
-     CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
-
-     if ((audioFile != nil) && (audioFile.recorder != nil)) {
-         NSLog(@"Resumed recording audio sample '%@'", audioFile.resourcePath);
-         [audioFile.recorder record];
-         // no callback - that will happen in audioRecorderDidFinishRecording
-         [self onStatus:MEDIA_STATE mediaId:mediaId param:@(MEDIA_RUNNING)];
-     }
-
-}
-
- - (void)pauseRecordingAudio:(CDVInvokedUrlCommand*)command
-  {
-     NSString* mediaId = [command argumentAtIndex:0];
-
-     CDVAudioFile* audioFile = [[self soundCache] objectForKey:mediaId];
-
-     if ((audioFile != nil) && (audioFile.recorder != nil)) {
-         NSLog(@"Paused recording audio sample '%@'", audioFile.resourcePath);
-         [audioFile.recorder pause];
-         // no callback - that will happen in audioRecorderDidFinishRecording
-         [self onStatus:MEDIA_STATE mediaId:mediaId param:@(MEDIA_PAUSED)];
-     }
- }
-
 - (void)messageChannel:(CDVInvokedUrlCommand*)command
 {
     self.statusCallbackId = command.callbackId;
 }
 
-- (void)onStatus:(CDVMediaMsg)what mediaId:(NSString*)mediaId param:(NSObject*)param
+- (void)onStatus:(CDVAudioPlayerMsg)what mediaId:(NSString*)mediaId param:(NSObject*)param
 {
     if (self.statusCallbackId!=nil) { //new way, android,windows compatible
         NSMutableDictionary* status=[NSMutableDictionary dictionary];
@@ -949,20 +739,14 @@
 
 @end
 
-@implementation CDVAudioFile
+@implementation CDVAudioPlayerFile
 
 @synthesize resourcePath;
 @synthesize resourceURL;
 @synthesize player, volume, rate;
-@synthesize recorder;
 
 @end
 @implementation CDVAudioPlayerWithMediaId
-@synthesize mediaId;
-
-@end
-
-@implementation CDVAudioRecorder
 @synthesize mediaId;
 
 @end
